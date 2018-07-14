@@ -1,0 +1,7 @@
+[package]
+name = "fencer_lib"
+version = "0.1.0"
+authors = ["Stefano Probst <senden9@gmail.com>"]
+
+[dependencies]
+kamadak-exif = "0.3.1"
