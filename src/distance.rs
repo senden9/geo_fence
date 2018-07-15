@@ -13,6 +13,11 @@ pub enum ConvertError {
     /// The result is to large to use safely. If our result is too large for
     /// the used approximation method then we have a low precision. Wa want avoid that.
     ResultToLarge,
+    /// Thrown when it was not possible to extract coordinates of a EXIF. Strongly possible
+    /// that they are simple missing in a image.
+    ExifNotFound,
+    /// Thrown when there is unexpected content in a exif tag. Such as a ASCII typ in a GPS field.
+    UnexpectedExifContent,
 }
 
 /// Calculate the distance between two points on earth over the surface.

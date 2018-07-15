@@ -5,6 +5,7 @@
 //! Maybe usefull things, like the `fcc_approximation`, will get later they own libary so that it
 //! is more reusable.
 
+// Todo: Sort out double entries here:
 #![warn(
     missing_debug_implementations, missing_copy_implementations, trivial_casts,
     trivial_numeric_casts, unsafe_code, unstable_features, unused_import_braces,
@@ -12,10 +13,13 @@
     trivial_casts, trivial_numeric_casts, unsafe_code, unstable_features, unused_import_braces,
     unused_qualifications, unused_extern_crates, unused_results, missing_docs
 )]
+
 extern crate exif;
 
 pub mod distance;
 pub mod gps_position;
+
+use gps_position::GPSPosition;
 
 /// Testfunction to evaluate the exif lib.
 pub fn read_exif() {
@@ -35,6 +39,8 @@ pub fn read_exif() {
             f.value
         );
     }
+
+    GPSPosition::from_exif(reader.fields());
 }
 
 #[cfg(test)]
