@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "fencer_lib",
+    "geo_fence",
+]
+
