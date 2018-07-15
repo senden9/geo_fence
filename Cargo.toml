@@ -1,0 +1,10 @@
+[package]
+name = "geo_fence"
+version = "0.1.0"
+authors = ["Stefano Probst <senden9@gmail.com>"]
+
+[dependencies]
+fencer_lib = {path = "../fencer_lib" }
+
+[profile.release]
+lto = true
