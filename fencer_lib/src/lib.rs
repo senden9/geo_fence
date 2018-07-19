@@ -21,27 +21,6 @@ pub mod gps_position;
 
 use gps_position::GPSPosition;
 
-/// Testfunction to evaluate the exif lib.
-pub fn read_exif() {
-    let path = "test_data/img01.jpg";
-    let file = std::fs::File::open(path).unwrap();
-    let reader = exif::Reader::new(&mut std::io::BufReader::new(&file)).unwrap();
-    for f in reader
-        .fields()
-        .into_iter()
-        .filter(|x| !x.thumbnail && x.tag.context() == exif::Context::Gps)
-    {
-        println!(
-            "{} {} {} - {:?}",
-            f.thumbnail,
-            f.tag,
-            f.value.display_as(f.tag),
-            f.value
-        );
-    }
-
-    GPSPosition::from_exif(reader.fields());
-}
 
 #[cfg(test)]
 mod tests {
