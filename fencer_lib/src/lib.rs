@@ -45,8 +45,34 @@ pub fn read_exif() {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    const IMG01: &str = "../test_data/img01.jpg";
+
+    // Todo: Write tests for the other images. Also search non PosPos images.
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn img01_into_range() {
+        let position_test = GPSPosition {
+            lat: 46.617128472222,
+            lon: 14.266543388888,
+        };
+        let position_image = GPSPosition::from_image_path(IMG01).unwrap();
+        let dist = position_image.distance(&position_test).unwrap();
+        println!("Distance: {}m", dist);
+        assert_ne!(dist, 0.0);
+        assert!(dist < 0.1);
+    }
+
+    #[test]
+    fn img01_out_of_range() {
+        let position_test = GPSPosition {
+            lat: 47.061578,
+            lon: 15.420153,
+        };
+        let position_image = GPSPosition::from_image_path(IMG01).unwrap();
+        let dist = position_image.distance(&position_test).unwrap();
+        println!("Distance: {}m", dist);
+        assert!(dist < 133e3);
+        assert!(dist > 100e3);
     }
 }

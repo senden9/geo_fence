@@ -3,6 +3,7 @@
 use distance::{fcc_approximation, ConvertError, Meter};
 use exif;
 use exif::Field;
+use std;
 
 /// WGS84 Coordinates.
 ///
@@ -20,6 +21,13 @@ impl GPSPosition {
     /// Calculate the distance in meters between two points.
     pub fn distance(&self, other: &GPSPosition) -> Result<Meter, ConvertError> {
         fcc_approximation(self, other)
+    }
+
+    // Todo: Replace this ugly unwraps.
+    pub fn from_image_path(path: &str) -> Result<GPSPosition, ConvertError> {
+        let file = std::fs::File::open(path).unwrap();
+        let reader = exif::Reader::new(&mut std::io::BufReader::new(&file)).unwrap();
+        GPSPosition::from_exif(reader.fields())
     }
 
     /// Try to parse `GPSPosition` from EXIF data of a image.
