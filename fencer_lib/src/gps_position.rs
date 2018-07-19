@@ -25,6 +25,8 @@ impl GPSPosition {
     /// Try to parse `GPSPosition` from EXIF data of a image.
     // Todo: Try also negative values. Like photos form africa.
     pub fn from_exif(fields: &[Field]) -> Result<GPSPosition, ConvertError> {
+        let mut lat = None;
+        let mut lon = None;
         for f in fields
             .into_iter()
             .filter(|x| !x.thumbnail && x.tag.context() == exif::Context::Gps)
@@ -32,17 +34,22 @@ impl GPSPosition {
             match f.tag {
                 // Todo: convert `rational` into floats and save them so that we can create a struct.
                 exif::Tag::GPSLatitude => {
-                    let lat = value_to_float(&f.value)?;
-                    println!("Found Lat! {:?} = {}", f.value, lat);
+                    lat = Some(value_to_float(&f.value)?);
                 }
                 exif::Tag::GPSLongitude => {
-                    let lon = value_to_float(&f.value)?;
-                    println!("Found Long! {:?} = {}", f.value, lon);
+                    lon = Some(value_to_float(&f.value)?);
                 }
                 _ => { /* default = noop*/ }
             }
         }
-        Err(ConvertError::ExifNotFound)
+        if lat.is_some() && lon.is_some() {
+            Ok(GPSPosition {
+                lat: lat.unwrap(),
+                lon: lon.unwrap(),
+            })
+        } else {
+            Err(ConvertError::ExifNotFound)
+        }
     }
 }
 

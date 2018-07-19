@@ -45,9 +45,6 @@ pub fn read_exif() {
 
 #[cfg(test)]
 mod tests {
-    use exif;
-    use std;
-
     #[test]
     fn it_works() {
         assert_eq!(2 + 2, 4);
