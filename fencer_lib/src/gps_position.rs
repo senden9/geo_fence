@@ -31,12 +31,16 @@ impl GPSPosition {
         let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
         if let Err(e) = &reader {
             match e {
-                exif::Error::InvalidFormat { .. } => {
+                exif::Error::NotFound { .. } => {
                     return Err(ConvertError::ExifNotFound {
                         path: Some(path.to_string_lossy().to_string()),
                     })
                 }
-                _ => {}
+                _ => {
+                    return Err(ConvertError::ExifNotFound {
+                        path: Some(path.to_string_lossy().to_string()),
+                    })
+                }
             }
         }
         match GPSPosition::from_exif(reader.unwrap().fields()) {

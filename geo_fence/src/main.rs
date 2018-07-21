@@ -137,7 +137,10 @@ fn check_image(point: &GPSPosition, max_distance: f64, image: &Path) -> Result<b
     let pos = GPSPosition::from_image_path(&image);
     if let Err(e) = &pos {
         match e {
-            distance::ConvertError::ExifNotFound { .. } => return Ok(false),
+            distance::ConvertError::ExifNotFound { path } => {
+                println!("Some problem with: {:?}", path);
+                return Ok(false);
+            }
             _ => {}
         }
     }
