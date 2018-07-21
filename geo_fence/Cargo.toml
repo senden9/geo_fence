@@ -5,6 +5,14 @@ authors = ["Stefano Probst <senden9@gmail.com>"]
 
 [dependencies]
 fencer_lib = {path = "../fencer_lib" }
+structopt = "0.2.10"
+structopt-derive = "0.2.10"
+clap-verbosity-flag = "0.1"
+log = "0.4.3"
+env_logger = "0.5.10"
+rayon = "1.0.2"
+failure = "0.1"
+walkdir = "2.1"
 
 [profile.release]
 lto = true

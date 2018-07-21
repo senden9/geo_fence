@@ -8,16 +8,22 @@ use gps_position::GPSPosition;
 pub type Meter = f64;
 
 /// Our error type for conversation operations.
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Fail)]
 pub enum ConvertError {
     /// The result is to large to use safely. If our result is too large for
     /// the used approximation method then we have a low precision. Wa want avoid that.
+    #[fail(display = "Result to large. Lost in precession with thad approximation method.")]
     ResultToLarge,
     /// Thrown when it was not possible to extract coordinates of a EXIF. Strongly possible
     /// that they are simple missing in a image.
-    ExifNotFound,
+    #[fail(display = "No EXIF data found in image. '{:?}'", path)]
+    ExifNotFound { path: Option<String> },
     /// Thrown when there is unexpected content in a exif tag. Such as a ASCII typ in a GPS field.
+    #[fail(display = "Found unexpected EXIF in a tag.")]
     UnexpectedExifContent,
+    /// Can not parse a string into a `GPSPosition`.
+    #[fail(display = "Can not parse this as a coordinate pair. '{}'", input)]
+    UnrecognisedString { input: String },
 }
 
 /// Calculate the distance between two points on earth over the surface.

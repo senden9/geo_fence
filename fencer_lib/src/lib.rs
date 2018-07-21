@@ -15,12 +15,13 @@
 )]
 
 extern crate exif;
+#[macro_use]
+extern crate failure;
 
 pub mod distance;
 pub mod gps_position;
 
-use gps_position::GPSPosition;
-
+pub use gps_position::GPSPosition;
 
 #[cfg(test)]
 mod tests {
@@ -35,7 +36,7 @@ mod tests {
             lat: 46.617128472222,
             lon: 14.266543388888,
         };
-        let position_image = GPSPosition::from_image_path(IMG01).unwrap();
+        let position_image = GPSPosition::from_image_path(&IMG01).unwrap();
         let dist = position_image.distance(&position_test).unwrap();
         println!("Distance: {}m", dist);
         assert_ne!(dist, 0.0);
@@ -48,7 +49,7 @@ mod tests {
             lat: 47.061578,
             lon: 15.420153,
         };
-        let position_image = GPSPosition::from_image_path(IMG01).unwrap();
+        let position_image = GPSPosition::from_image_path(&IMG01).unwrap();
         let dist = position_image.distance(&position_test).unwrap();
         println!("Distance: {}m", dist);
         assert!(dist < 133e3);

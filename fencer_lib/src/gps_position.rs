@@ -4,6 +4,7 @@ use distance::{fcc_approximation, ConvertError, Meter};
 use exif;
 use exif::Field;
 use std;
+use std::path::Path;
 
 /// WGS84 Coordinates.
 ///
@@ -24,10 +25,26 @@ impl GPSPosition {
     }
 
     // Todo: Replace this ugly unwraps.
-    pub fn from_image_path(path: &str) -> Result<GPSPosition, ConvertError> {
+    pub fn from_image_path(path: &AsRef<Path>) -> Result<GPSPosition, ConvertError> {
+        let path = path.as_ref();
         let file = std::fs::File::open(path).unwrap();
-        let reader = exif::Reader::new(&mut std::io::BufReader::new(&file)).unwrap();
-        GPSPosition::from_exif(reader.fields())
+        let reader = exif::Reader::new(&mut std::io::BufReader::new(&file));
+        if let Err(e) = &reader {
+            match e {
+                exif::Error::InvalidFormat { .. } => {
+                    return Err(ConvertError::ExifNotFound {
+                        path: Some(path.to_string_lossy().to_string()),
+                    })
+                }
+                _ => {}
+            }
+        }
+        match GPSPosition::from_exif(reader.unwrap().fields()) {
+            Ok(pos) => Ok(pos),
+            Err(_) => Err(ConvertError::ExifNotFound {
+                path: Some(path.to_string_lossy().to_string()),
+            }),
+        }
     }
 
     /// Try to parse `GPSPosition` from EXIF data of a image.
@@ -56,7 +73,24 @@ impl GPSPosition {
                 lon: lon.unwrap(),
             })
         } else {
-            Err(ConvertError::ExifNotFound)
+            Err(ConvertError::ExifNotFound { path: None })
+        }
+    }
+
+    pub fn parse_from_string(inp: &str) -> Result<GPSPosition, ConvertError> {
+        let mut inp = String::from(inp);
+        inp = inp.replace(" ", ""); // remove whitespace
+        let splited: Vec<&str> = inp.split(|x| x == ',' || x == ';').collect();
+        if splited.len() != 2 {
+            return Err(ConvertError::UnrecognisedString { input: inp.clone() });
+        }
+
+        let lat = splited[0].parse::<f64>();
+        let lon = splited[1].parse::<f64>();
+
+        match (lat, lon) {
+            (Ok(lat), Ok(lon)) => Ok(GPSPosition { lat, lon }),
+            _ => Err(ConvertError::UnrecognisedString { input: inp.clone() }),
         }
     }
 }
@@ -121,5 +155,33 @@ mod tests {
         assert!(
             (KLAGENFURT_DD.lon - value_to_float(&klagenfurt_dms_lon).unwrap()).abs() < CONVERT_EPS
         );
+    }
+
+    #[test]
+    fn parse_string_1() {
+        let inp = "46.605243, 14.296923";
+        let pos = GPSPosition::parse_from_string(inp).unwrap();
+        assert_eq!(KLAGENFURT_DD, pos);
+    }
+
+    #[test]
+    fn parse_string_2() {
+        let inp = "45.212291; -79.327838";
+        let pos = GPSPosition::parse_from_string(inp).unwrap();
+        assert_eq!(UTTERSON_DD, pos);
+    }
+
+    #[test]
+    fn parse_string_neg_1() {
+        let inp = "46.605243 14.296923";
+        let pos = GPSPosition::parse_from_string(inp);
+        assert_eq!(Err(ConvertError::UnrecognisedString), pos);
+    }
+
+    #[test]
+    fn parse_string_neg_2() {
+        let inp = "45.212291;";
+        let pos = GPSPosition::parse_from_string(inp);
+        assert_eq!(Err(ConvertError::UnrecognisedString), pos);
     }
 }

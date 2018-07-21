@@ -5,3 +5,4 @@ authors = ["Stefano Probst <senden9@gmail.com>"]
 
 [dependencies]
 kamadak-exif = "0.3.1"
+failure = "0.1"
