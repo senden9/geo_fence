@@ -77,12 +77,14 @@ impl GPSPosition {
         }
     }
 
-    pub fn parse_from_string(inp: &str) -> Result<GPSPosition, ConvertError> {
-        let mut inp = String::from(inp);
+    pub fn parse_from_string(input: &str) -> Result<GPSPosition, ConvertError> {
+        let mut inp = String::from(input);
         inp = inp.replace(" ", ""); // remove whitespace
         let splited: Vec<&str> = inp.split(|x| x == ',' || x == ';').collect();
         if splited.len() != 2 {
-            return Err(ConvertError::UnrecognisedString { input: inp.clone() });
+            return Err(ConvertError::UnrecognisedString {
+                input: input.to_string(),
+            });
         }
 
         let lat = splited[0].parse::<f64>();
@@ -90,7 +92,9 @@ impl GPSPosition {
 
         match (lat, lon) {
             (Ok(lat), Ok(lon)) => Ok(GPSPosition { lat, lon }),
-            _ => Err(ConvertError::UnrecognisedString { input: inp.clone() }),
+            _ => Err(ConvertError::UnrecognisedString {
+                input: input.to_string(),
+            }),
         }
     }
 }
@@ -175,13 +179,23 @@ mod tests {
     fn parse_string_neg_1() {
         let inp = "46.605243 14.296923";
         let pos = GPSPosition::parse_from_string(inp);
-        assert_eq!(Err(ConvertError::UnrecognisedString), pos);
+        assert_eq!(
+            Err(ConvertError::UnrecognisedString {
+                input: inp.to_string()
+            }),
+            pos
+        );
     }
 
     #[test]
     fn parse_string_neg_2() {
         let inp = "45.212291;";
         let pos = GPSPosition::parse_from_string(inp);
-        assert_eq!(Err(ConvertError::UnrecognisedString), pos);
+        assert_eq!(
+            Err(ConvertError::UnrecognisedString {
+                input: inp.to_string()
+            }),
+            pos
+        );
     }
 }

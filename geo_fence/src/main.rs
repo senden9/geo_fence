@@ -71,7 +71,6 @@ fn is_jpg(entry: &DirEntry) -> bool {
     is_file && right_ending
 }
 
-
 fn run_sequential<P>(path: P, max_distance: f64, ref_pos: &str) -> Result<()>
 where
     P: AsRef<Path>,
@@ -92,7 +91,6 @@ where
     }
     Ok(())
 }
-
 
 fn run_parallel<P>(path: P, max_distance: f64, ref_pos: &str) -> Result<()>
 where
@@ -128,7 +126,9 @@ where
         .collect();
 
     positive.sort_unstable();
-    positive.iter().for_each(|x| println!("{}", x.to_string_lossy()));
+    positive
+        .iter()
+        .for_each(|x| println!("{}", x.to_string_lossy()));
 
     Ok(())
 }
