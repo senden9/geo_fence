@@ -6,3 +6,15 @@ authors = ["Stefano Probst <senden9@gmail.com>"]
 [dependencies]
 kamadak-exif = "0.3.1"
 failure = "0.1"
+
+[dev-dependencies]
+criterion = "0.2"
+rayon = "1.0.2"
+walkdir = "2.1"
+
+[profile.bench]
+lto = true
+
+[[bench]]
+name = "my_benchmark"
+harness = false

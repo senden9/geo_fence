@@ -30,8 +30,11 @@ struct Cli {
     /// The file to read
     dir: String,
     /// Parallel implementation? Default is secqiential.
-    #[structopt(long = "palallel", short = "x")]
+    #[structopt(long = "parallel", short = "x")]
     parallel: bool,
+    /// Number of threads for the search. If multi-threading is enabled.
+    #[structopt(long = "threads", short = "s", default_value = "10")]
+    threads: usize,
     #[structopt(flatten)]
     verbosity: Verbosity,
 }
@@ -43,7 +46,7 @@ fn main() {
     debug!("this is a debug {}", "message");
 
     rayon::ThreadPoolBuilder::new()
-        .num_threads(24)
+        .num_threads(args.threads)
         .build_global()
         .unwrap();
 
